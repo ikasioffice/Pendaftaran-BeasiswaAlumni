@@ -1,7 +1,7 @@
 /* === MAIN.JS - Shared Utilities === */
 
 // ⚠️ GANTI dengan URL Web App Apps Script kamu setelah deploy (lihat PANDUAN_PUBLISH.md)
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzZ5B-tjw8zdZjkNWOSD99ZnTtJSocamoBH9dM4bvFYz9vKvd_zlJoE60nqxw9oW6H/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/GANTI_DENGAN_DEPLOYMENT_ID/exec';
 // ⚠️ Harus SAMA PERSIS dengan ADMIN_TOKEN di Code.gs
 const ADMIN_API_TOKEN = 'beasiswa2026';
 
