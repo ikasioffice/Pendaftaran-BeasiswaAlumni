@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontak - Beasiswa Alumni Indonesia</title>
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('beasiswa_theme') || 'light');</script>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-white" id="navbar">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">🎓</div>
+      <span>Beasiswa <strong>Alumni</strong></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="pendaftaran.html">Pendaftaran</a></li>
+      <li><a href="pengumuman.html">Pengumuman</a></li>
+      <li><a href="kontak.html">Kontak</a></li>
+    </ul>
+    <div class="site-toggles">
+      <button class="toggle-btn theme-toggle-btn" onclick="toggleTheme()" aria-label="Mode Gelap" title="Mode Terang/Gelap"><i class="fas fa-moon"></i></button>
+      <button class="toggle-btn music-toggle-btn" onclick="toggleMusic()" aria-label="Putar Musik" title="Musik Latar"><i class="fas fa-volume-mute"></i></button>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div id="ytAudioPlayer" style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none"></div>
+
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-headset" style="margin-right:12px;opacity:.8"></i>Hubungi Kami</h1>
+    <p>Ada pertanyaan seputar beasiswa? Kami siap membantu Anda melalui berbagai saluran komunikasi.</p>
+    <div class="breadcrumb">
+      <a href="index.html">Beranda</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Kontak</span>
+    </div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- Info -->
+      <div>
+        <div class="contact-cta-card">
+          <h3>IKASI Office</h3>
+          <p>Kami siap membantu Anda melalui saluran berikut ini.</p>
+          <div class="contact-cta-list">
+            <a class="contact-cta-item" href="https://wa.me/6281234681730" target="_blank" rel="noopener">
+              <div class="cta-icon"><i class="fab fa-whatsapp"></i></div>
+              <div>
+                <div class="cta-label">WhatsApp</div>
+                <div class="cta-value">0812-3468-1730</div>
+              </div>
+            </a>
+            <a class="contact-cta-item" href="mailto:ikasioffice@gmail.com">
+              <div class="cta-icon"><i class="fas fa-envelope"></i></div>
+              <div>
+                <div class="cta-label">Email</div>
+                <div class="cta-value">ikasioffice@gmail.com</div>
+              </div>
+            </a>
+            <a class="contact-cta-item" href="https://instagram.com/ikasi.piliitb.polban" target="_blank" rel="noopener">
+              <div class="cta-icon"><i class="fab fa-instagram"></i></div>
+              <div>
+                <div class="cta-label">Instagram</div>
+                <div class="cta-value">ikasi.piliitb.polban</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div>
+        <div class="form-card">
+          <div class="form-section-title"><i class="fas fa-paper-plane"></i> Kirim Pesan</div>
+          <p style="color:var(--gray-600);margin-bottom:28px;font-size:.9375rem">Isi formulir di bawah ini dan tim kami akan merespons dalam 1×24 jam kerja.</p>
+
+          <div id="contactSuccess" style="display:none;text-align:center;padding:40px 20px">
+            <div style="width:80px;height:80px;border-radius:50%;background:#d1fae5;color:var(--success);font-size:2.5rem;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+              <i class="fas fa-check"></i>
+            </div>
+            <h3 style="color:var(--text-strong);margin-bottom:8px">Pesan Terkirim!</h3>
+            <p style="color:var(--gray-600)">Terima kasih telah menghubungi kami. Tim kami akan segera merespons pesan Anda.</p>
+            <button onclick="resetContactForm()" class="btn btn-outline" style="margin-top:20px">Kirim Pesan Lagi</button>
+          </div>
+
+          <form id="contactForm" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nama Lengkap <span class="required">*</span></label>
+                <input type="text" class="form-control" id="cNama" placeholder="Nama Anda">
+                <div class="form-error" id="err-cNama">Nama wajib diisi.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email <span class="required">*</span></label>
+                <input type="email" class="form-control" id="cEmail" placeholder="email@domain.com">
+                <div class="form-error" id="err-cEmail">Email tidak valid.</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nomor Telepon</label>
+                <input type="tel" class="form-control" id="cTelepon" placeholder="08xxxxxxxxxx">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kategori Pertanyaan <span class="required">*</span></label>
+                <select class="form-control" id="cKategori">
+                  <option value="">-- Pilih Kategori --</option>
+                  <option value="Informasi Beasiswa">Informasi Beasiswa</option>
+                  <option value="Pendaftaran">Pendaftaran</option>
+                  <option value="Persyaratan Dokumen">Persyaratan Dokumen</option>
+                  <option value="Hasil Seleksi">Hasil Seleksi</option>
+                  <option value="Teknis Website">Teknis Website</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+                <div class="form-error" id="err-cKategori">Pilih kategori pertanyaan.</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subjek <span class="required">*</span></label>
+              <input type="text" class="form-control" id="cSubjek" placeholder="Subjek pesan Anda">
+              <div class="form-error" id="err-cSubjek">Subjek wajib diisi.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pesan <span class="required">*</span></label>
+              <textarea class="form-control" id="cPesan" rows="5" placeholder="Tuliskan pertanyaan atau pesan Anda di sini..."></textarea>
+              <div class="form-error" id="err-cPesan">Pesan wajib diisi.</div>
+            </div>
+            <button type="button" class="btn btn-primary btn-block btn-lg" onclick="submitContact()" id="btnContact">
+              <i class="fas fa-paper-plane"></i> Kirim Pesan
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="logo"><div class="logo-icon">🎓</div><span>Beasiswa <strong>Alumni</strong></span></a>
+        <p>Program beasiswa terpercaya untuk mahasiswa berprestasi Indonesia.</p>
+        <div class="social-links">
+          <a href="https://instagram.com/ikasi.piliitb.polban" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <h4>Navigasi</h4>
+        <ul>
+          <li><a href="index.html">Beranda</a></li>
+          <li><a href="pendaftaran.html">Pendaftaran</a></li>
+          <li><a href="pengumuman.html">Pengumuman</a></li>
+          <li><a href="kontak.html">Kontak</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Informasi</h4>
+        <ul>
+          <li><a href="index.html#timeline">Timeline</a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4>Kontak</h4>
+        <div class="contact-item"><i class="fab fa-whatsapp"></i><span>0812-3468-1730 (WhatsApp)</span></div>
+        <div class="contact-item"><i class="fas fa-envelope"></i><span>ikasioffice@gmail.com</span></div>
+        <div class="contact-item"><i class="fab fa-instagram"></i><span>ikasi.piliitb.polban</span></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Beasiswa Alumni Indonesia. Hak Cipta Dilindungi.</p>
+      <p>Dibuat dengan ❤️ untuk pendidikan Indonesia</p>
+    </div>
+  </div>
+</footer>
+
+<a href="admin.html" class="admin-corner-link">Admin</a>
+<script src="main.js"></script>
+<script>
+function submitContact() {
+    const cNama = document.getElementById('cNama').value.trim();
+    const cEmail = document.getElementById('cEmail').value.trim();
+    const cKategori = document.getElementById('cKategori').value;
+    const cSubjek = document.getElementById('cSubjek').value.trim();
+    const cPesan = document.getElementById('cPesan').value.trim();
+    let ok = true;
+
+    document.querySelectorAll('.form-error').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('.form-control').forEach(e => e.classList.remove('is-invalid'));
+
+    if (!cNama) { document.getElementById('err-cNama').classList.add('show'); document.getElementById('cNama').classList.add('is-invalid'); ok = false; }
+    if (!cEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cEmail)) { document.getElementById('err-cEmail').classList.add('show'); document.getElementById('cEmail').classList.add('is-invalid'); ok = false; }
+    if (!cKategori) { document.getElementById('err-cKategori').classList.add('show'); document.getElementById('cKategori').classList.add('is-invalid'); ok = false; }
+    if (!cSubjek) { document.getElementById('err-cSubjek').classList.add('show'); document.getElementById('cSubjek').classList.add('is-invalid'); ok = false; }
+    if (!cPesan) { document.getElementById('err-cPesan').classList.add('show'); document.getElementById('cPesan').classList.add('is-invalid'); ok = false; }
+
+    if (!ok) return;
+
+    const btn = document.getElementById('btnContact');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+
+    setTimeout(() => {
+        document.getElementById('contactForm').style.display = 'none';
+        document.getElementById('contactSuccess').style.display = 'block';
+    }, 1000);
+}
+
+function resetContactForm() {
+    document.getElementById('contactForm').reset();
+    document.getElementById('contactForm').style.display = 'block';
+    document.getElementById('contactSuccess').style.display = 'none';
+    document.getElementById('btnContact').disabled = false;
+    document.getElementById('btnContact').innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Pesan';
+}
+</script>
+</body>
+</html>

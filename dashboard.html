@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Admin - Beasiswa Alumni Indonesia</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout">
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">🎓</div>
+        <span>Beasiswa <strong>Alumni</strong></span>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="sidebar-label">Menu Utama</span>
+      <button class="sidebar-item active" onclick="showPanel('beranda')" id="nav-beranda">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </button>
+      <button class="sidebar-item" onclick="showPanel('pendaftar')" id="nav-pendaftar">
+        <i class="fas fa-users"></i> Data Pendaftar
+      </button>
+      <button class="sidebar-item" onclick="showPanel('pengumuman')" id="nav-pengumuman">
+        <i class="fas fa-bullhorn"></i> Pengumuman
+      </button>
+      <span class="sidebar-label">Website</span>
+      <button class="sidebar-item" onclick="showPanel('herocards')" id="nav-herocards">
+        <i class="fas fa-image"></i> Kartu Beranda
+      </button>
+      <button class="sidebar-item" onclick="showPanel('timeline')" id="nav-timeline">
+        <i class="fas fa-route"></i> Timeline Pendaftaran
+      </button>
+      <button class="sidebar-item" onclick="showPanel('deadline')" id="nav-deadline">
+        <i class="fas fa-hourglass-half"></i> Batas Pendaftaran
+      </button>
+      <span class="sidebar-label">Sistem</span>
+      <a href="index.html" class="sidebar-item" style="text-decoration:none">
+        <i class="fas fa-globe"></i> Lihat Website
+      </a>
+      <button class="sidebar-item" onclick="doLogout()">
+        <i class="fas fa-sign-out-alt"></i> Keluar
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="user-avatar">A</div>
+        <div>
+          <div style="color:var(--white);font-size:.875rem;font-weight:600">Administrator</div>
+          <div style="color:var(--gray-400);font-size:.75rem">admin@beasiswaalumni.id</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Sidebar Toggle (mobile) -->
+  <button class="sidebar-toggle" id="sidebarToggle" onclick="openSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="dashboard-topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-user">
+        <span id="topbarDate" style="font-size:.8125rem;color:var(--gray-500)"></span>
+        <div class="user-avatar">A</div>
+        <span>Admin</span>
+      </div>
+    </div>
+
+    <div class="dashboard-content">
+
+      <!-- Panel: Beranda / Dashboard -->
+      <div class="dashboard-panel active" id="panel-beranda">
+        <div class="panel-header">
+          <h2>Dashboard</h2>
+          <span style="font-size:.875rem;color:var(--gray-500)" id="lastUpdate"></span>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <!-- Chart placeholder -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
+          <div class="table-container" style="padding:24px">
+            <div class="table-title" style="margin-bottom:16px">Pendaftar Terbaru</div>
+            <div id="recentApplicants"></div>
+          </div>
+          <div class="table-container" style="padding:24px">
+            <div class="table-title" style="margin-bottom:16px">Distribusi Status</div>
+            <div id="statusChart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Pendaftar -->
+      <div class="dashboard-panel" id="panel-pendaftar">
+        <div class="panel-header">
+          <h2>Data Pendaftar</h2>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <select class="form-control" id="filterStatus" onchange="renderPendaftar()" style="width:auto;padding:8px 14px;font-size:.875rem">
+              <option value="">Semua Status</option>
+              <option value="pending">Pending</option>
+              <option value="lolos">Lolos</option>
+              <option value="wawancara">Wawancara</option>
+              <option value="tidak_lolos">Tidak Lolos</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">
+            <div class="table-title" id="pendaftarCount">Memuat data...</div>
+            <div class="table-toolbar">
+              <div class="table-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchPendaftar" placeholder="Cari nama, NIM, program studi, kelas..." oninput="renderPendaftar()">
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="exportData()">
+                <i class="fas fa-download"></i> Export CSV
+              </button>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>ID</th>
+                  <th>Nama</th>
+                  <th>Program Studi</th>
+                  <th>Kelas</th>
+                  <th>Smt</th>
+                  <th>IPK</th>
+                  <th>Tgl Daftar</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="pendaftarTable"></tbody>
+            </table>
+          </div>
+          <div id="pendaftarEmpty" class="empty-state" style="display:none">
+            <i class="fas fa-users"></i>
+            <h3>Belum Ada Pendaftar</h3>
+            <p>Belum ada data pendaftar yang sesuai filter.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Pengumuman -->
+      <div class="dashboard-panel" id="panel-pengumuman">
+        <div class="panel-header">
+          <h2>Manajemen Pengumuman</h2>
+          <button class="btn btn-primary" onclick="openAnnModal()">
+            <i class="fas fa-plus"></i> Tambah Pengumuman
+          </button>
+        </div>
+        <div id="annList"></div>
+      </div>
+
+      <!-- Panel: Kartu Beranda (Hero) -->
+      <div class="dashboard-panel" id="panel-herocards">
+        <div class="panel-header">
+          <h2>Kartu Beranda</h2>
+          <button class="btn btn-primary" onclick="openHeroCardModal()">
+            <i class="fas fa-plus"></i> Tambah Kartu
+          </button>
+        </div>
+        <p style="color:var(--gray-500);font-size:.875rem;margin-top:-16px;margin-bottom:20px">Atur kartu mengambang yang tampil di bagian atas (hero) halaman Beranda. Gunakan tombol panah untuk mengubah urutan. Disarankan maksimal 4 kartu agar posisinya tetap rapi.</p>
+        <div id="heroCardsManageList"></div>
+      </div>
+
+      <!-- Panel: Timeline Pendaftaran -->
+      <div class="dashboard-panel" id="panel-timeline">
+        <div class="panel-header">
+          <h2>Timeline Pendaftaran</h2>
+          <button class="btn btn-primary" onclick="openTimelineModal()">
+            <i class="fas fa-plus"></i> Tambah Tahap
+          </button>
+        </div>
+        <p style="color:var(--gray-500);font-size:.875rem;margin-top:-16px;margin-bottom:20px">Atur tahapan yang tampil di halaman "Timeline Pendaftaran" website. Gunakan tombol panah untuk mengubah urutan, dan tandai satu tahap sebagai "Sedang Berjalan" agar ditandai aktif di website.</p>
+        <div id="timelineManageList"></div>
+      </div>
+
+      <!-- Panel: Batas Pendaftaran -->
+      <div class="dashboard-panel" id="panel-deadline">
+        <div class="panel-header">
+          <h2>Batas Waktu Pendaftaran</h2>
+        </div>
+        <p style="color:var(--gray-500);font-size:.875rem;margin-top:-16px;margin-bottom:20px">Atur tanggal &amp; jam batas akhir pendaftaran. Nilai ini dipakai oleh hitung mundur (countdown) dan teks pada bagian "Siap Mendaftarkan Diri?" di halaman Beranda.</p>
+        <div class="table-container" style="padding:24px;max-width:420px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Tanggal &amp; Jam Batas Akhir <span class="required">*</span></label>
+            <input type="datetime-local" class="form-control" id="deadlineInput">
+          </div>
+          <button class="btn btn-primary" style="margin-top:20px" onclick="saveDeadline()">
+            <i class="fas fa-save"></i> Simpan Perubahan
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /dashboard-content -->
+  </main>
+</div>
+
+<!-- Modal: Detail / Edit Pendaftar -->
+<div class="modal-overlay" id="modalPendaftar">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalPendaftarTitle">Detail Pendaftar</h3>
+      <button class="modal-close" onclick="closeModal('modalPendaftar')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="modalPendaftarBody"></div>
+    <div class="modal-footer" id="modalPendaftarFooter"></div>
+  </div>
+</div>
+
+<!-- Modal: Ubah Status -->
+<div class="modal-overlay" id="modalStatus">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <h3>Ubah Status Pendaftar</h3>
+      <button class="modal-close" onclick="closeModal('modalStatus')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="statusApplicantInfo" style="background:var(--primary-50);border:1px solid var(--primary-100);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px"></div>
+      <div class="form-group">
+        <label class="form-label">Status Baru</label>
+        <select class="form-control" id="newStatus">
+          <option value="pending">Sedang Diproses (Pending)</option>
+          <option value="lolos">Lolos Seleksi</option>
+          <option value="wawancara">Dipanggil Wawancara</option>
+          <option value="tidak_lolos">Tidak Lolos</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pesan untuk Pendaftar (opsional)</label>
+        <textarea class="form-control" id="statusPesan" rows="3" placeholder="Misal: Jadwal wawancara 5 Mei 2025 pukul 10.00 WIB"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalStatus')">Batal</button>
+      <button class="btn btn-primary" onclick="saveStatus()">
+        <i class="fas fa-save"></i> Simpan Perubahan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Pengumuman Baru / Edit -->
+<div class="modal-overlay" id="modalAnn">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalAnnTitle">Tambah Pengumuman</h3>
+      <button class="modal-close" onclick="closeModal('modalAnn')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="annEditId">
+      <div class="form-group">
+        <label class="form-label">Judul Pengumuman <span class="required">*</span></label>
+        <input type="text" class="form-control" id="annJudul" placeholder="Judul pengumuman">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Kategori <span class="required">*</span></label>
+          <select class="form-control" id="annTipe">
+            <option value="umum">Umum</option>
+            <option value="seleksi">Hasil Seleksi</option>
+            <option value="wawancara">Wawancara</option>
+            <option value="penerima">Penerima</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal Publikasi <span class="required">*</span></label>
+          <input type="date" class="form-control" id="annTanggal">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Isi Pengumuman <span class="required">*</span></label>
+        <textarea class="form-control" id="annIsi" rows="6" placeholder="Tulis isi pengumuman di sini..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalAnn')">Batal</button>
+      <button class="btn btn-primary" onclick="saveAnn()">
+        <i class="fas fa-save"></i> Simpan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Kartu Beranda Baru / Edit -->
+<div class="modal-overlay" id="modalHeroCard">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h3 id="modalHeroCardTitle">Tambah Kartu Beranda</h3>
+      <button class="modal-close" onclick="closeModal('modalHeroCard')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="hcEditId">
+      <div class="form-group">
+        <label class="form-label">Icon (emoji)</label>
+        <input type="text" class="form-control" id="hcIcon" maxlength="4" placeholder="📚">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Judul <span class="required">*</span></label>
+        <input type="text" class="form-control" id="hcJudul" placeholder="Misal: Pendaftaran Dibuka">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Sub Teks <span class="required">*</span></label>
+        <input type="text" class="form-control" id="hcSub" placeholder="Misal: 1 Jan – 31 Mar 2025">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalHeroCard')">Batal</button>
+      <button class="btn btn-primary" onclick="saveHeroCard()">
+        <i class="fas fa-save"></i> Simpan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Timeline Baru / Edit -->
+<div class="modal-overlay" id="modalTimeline">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTimelineTitle">Tambah Tahap Timeline</h3>
+      <button class="modal-close" onclick="closeModal('modalTimeline')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tlEditId">
+      <div class="form-group">
+        <label class="form-label">Judul Tahap <span class="required">*</span></label>
+        <input type="text" class="form-control" id="tlJudul" placeholder="Misal: Wawancara Online">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tanggal / Periode <span class="required">*</span></label>
+        <input type="text" class="form-control" id="tlTanggal" placeholder="Misal: 1 – 10 Mei 2025">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Deskripsi <span class="required">*</span></label>
+        <textarea class="form-control" id="tlDeskripsi" rows="4" placeholder="Jelaskan detail tahap ini..."></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500;color:var(--gray-700)">
+          <input type="checkbox" id="tlAktif" style="width:16px;height:16px">
+          Tandai sebagai tahap yang sedang berjalan (aktif)
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalTimeline')">Batal</button>
+      <button class="btn btn-primary" onclick="saveTimeline()">
+        <i class="fas fa-save"></i> Simpan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Konfirmasi Hapus -->
+<div class="modal-overlay" id="modalHapus">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <h3>Konfirmasi Hapus</h3>
+      <button class="modal-close" onclick="closeModal('modalHapus')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="text-align:center;padding:16px 0">
+        <div style="width:64px;height:64px;border-radius:50%;background:#fee2e2;color:var(--danger);font-size:2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <i class="fas fa-trash-alt"></i>
+        </div>
+        <h3 style="color:var(--text-strong);margin-bottom:8px">Hapus Data?</h3>
+        <p style="color:var(--gray-600);font-size:.9375rem" id="hapusMsg">Data ini akan dihapus permanen dan tidak bisa dikembalikan.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalHapus')">Batal</button>
+      <button class="btn btn-danger" id="btnHapusConfirm">
+        <i class="fas fa-trash-alt"></i> Hapus
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

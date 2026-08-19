@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beasiswa Alumni Indonesia - Wujudkan Mimpimu</title>
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('beasiswa_theme') || 'light');</script>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">🎓</div>
+      <span>Beasiswa <strong>Alumni</strong></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="pendaftaran.html">Pendaftaran</a></li>
+      <li><a href="pengumuman.html">Pengumuman</a></li>
+      <li><a href="kontak.html">Kontak</a></li>
+    </ul>
+    <div class="site-toggles">
+      <button class="toggle-btn theme-toggle-btn" onclick="toggleTheme()" aria-label="Mode Gelap" title="Mode Terang/Gelap"><i class="fas fa-moon"></i></button>
+      <button class="toggle-btn music-toggle-btn" onclick="toggleMusic()" aria-label="Putar Musik" title="Musik Latar"><i class="fas fa-volume-mute"></i></button>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div id="ytAudioPlayer" style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none"></div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">🏆 Program Beasiswa 2026 / 2027</div>
+      <h1>Wujudkan Mimpimu<br>Bersama Kami</h1>
+      <p>Program Beasiswa Alumni IKASI hadir untuk mendukung mahasiswa Jurusan Teknik Sipil dalam menyelesaikan pendidikan dengan penuh semangat. Bergabunglah dan jadilah bagian dari keluarga besar Alumni IKASI.</p>
+      <div class="hero-actions">
+        <a href="pendaftaran.html" class="btn btn-primary btn-lg">
+          <i class="fas fa-pencil-alt"></i> Daftar Sekarang
+        </a>
+        <a href="#tentang" class="btn btn-outline-white btn-lg">
+          <i class="fas fa-info-circle"></i> Pelajari Lebih Lanjut
+        </a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div id="heroCardsWrap"></div>
+      <div class="hero-illustration">
+        <div class="illustration-circle c1"></div>
+        <div class="illustration-circle c2"></div>
+        <div class="illustration-circle c3"></div>
+        <div class="grad-cap">🎓</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tentang Beasiswa -->
+<section class="section" id="tentang">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Tentang Program</span>
+      <h2>Apa Itu Beasiswa Alumni IKASI?</h2>
+      <p>Program Beasiswa dari IKASI untuk mendukung mahasiswa Jurusan Teknik Sipil Polban khususnya tingkat akhir yang akan lulus.</p>
+    </div>
+    <div class="section-header" style="margin-top:48px;margin-bottom:32px">
+      <h3 style="font-size:1.5rem">Mengapa Program Ini Hadir?</h3>
+    </div>
+    <div class="features-grid features-grid-3">
+      <div class="feature-card">
+        <div class="feature-icon bg-blue">🎓</div>
+        <h3>Mendukung Mahasiswa</h3>
+        <p>Membantu mahasiswa yang memiliki kendala finansial dalam menyelesaikan pendidikan.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon bg-green">🤝</div>
+        <h3>Dari Alumni untuk Mahasiswa</h3>
+        <p>Menjadi wadah kontribusi dan kepedulian alumni IKASI terhadap generasi penerus.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon bg-purple">🔄</div>
+        <h3>Berkelanjutan</h3>
+        <p>Mengusung semangat Revolving Scholarship, agar manfaat beasiswa dapat terus dirasakan oleh mahasiswa berikutnya.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section class="section" id="timeline">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">Jadwal</span>
+      <h2>Timeline Pendaftaran 2025</h2>
+      <p>Ikuti setiap tahapan proses seleksi dengan cermat agar tidak melewatkan satu langkah pun.</p>
+    </div>
+    <div class="timeline" id="timelineList"></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <h2>Siap Mendaftarkan Diri?</h2>
+      <p>Jangan lewatkan kesempatan emas ini! Daftarkan dirimu sebelum <span id="ctaDeadlineText">31 Maret 2025</span>.</p>
+      <div class="cta-countdown" id="countdown">
+        <div class="countdown-item">
+          <span class="countdown-num" id="days">00</span>
+          <span class="countdown-label">Hari</span>
+        </div>
+        <div class="countdown-item">
+          <span class="countdown-num" id="hours">00</span>
+          <span class="countdown-label">Jam</span>
+        </div>
+        <div class="countdown-item">
+          <span class="countdown-num" id="minutes">00</span>
+          <span class="countdown-label">Menit</span>
+        </div>
+        <div class="countdown-item">
+          <span class="countdown-num" id="seconds">00</span>
+          <span class="countdown-label">Detik</span>
+        </div>
+      </div>
+      <a href="pendaftaran.html" class="btn btn-white btn-lg">
+        <i class="fas fa-arrow-right"></i> Daftar Sekarang
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Info Lanjut -->
+<section class="cta-section cta-section-light">
+  <div class="container">
+    <div class="cta-content">
+      <h2>Informasi Lebih Lanjut</h2>
+      <p>Masih ada pertanyaan seputar beasiswa? Tim IKASI Office siap membantu Anda.</p>
+      <a href="kontak.html" class="btn btn-primary btn-lg">
+        <i class="fas fa-headset"></i> Hubungi Kami
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">
+          <div class="logo-icon">🎓</div>
+          <span>Beasiswa <strong>Alumni</strong></span>
+        </a>
+        <p>Program beasiswa terpercaya untuk mahasiswa berprestasi Indonesia dalam mewujudkan mimpi pendidikan terbaik.</p>
+        <div class="social-links">
+          <a href="https://instagram.com/ikasi.piliitb.polban" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <h4>Navigasi</h4>
+        <ul>
+          <li><a href="index.html">Beranda</a></li>
+          <li><a href="pendaftaran.html">Pendaftaran</a></li>
+          <li><a href="pengumuman.html">Pengumuman</a></li>
+          <li><a href="kontak.html">Kontak</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Informasi</h4>
+        <ul>
+          <li><a href="#tentang">Tentang Beasiswa</a></li>
+          <li><a href="#timeline">Timeline</a></li>
+          <li><a href="pengumuman.html">Hasil Seleksi</a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4>Kontak Kami</h4>
+        <div class="contact-item">
+          <i class="fab fa-whatsapp"></i>
+          <span>0812-3468-1730 (WhatsApp)</span>
+        </div>
+        <div class="contact-item">
+          <i class="fas fa-envelope"></i>
+          <span>ikasioffice@gmail.com</span>
+        </div>
+        <div class="contact-item">
+          <i class="fab fa-instagram"></i>
+          <span>ikasi.piliitb.polban</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Beasiswa Alumni Indonesia. Hak Cipta Dilindungi.</p>
+      <p>Dibuat dengan ❤️ untuk kemajuan pendidikan Indonesia</p>
+    </div>
+  </div>
+</footer>
+
+<a href="admin.html" class="admin-corner-link">Admin</a>
+<script src="main.js"></script>
+<script>
+  (function renderHeroCards() {
+    const wrap = document.getElementById('heroCardsWrap');
+    if (!wrap) return;
+    const cards = (DB.getHeroCards() || []).slice().sort((a, b) => a.urutan - b.urutan);
+    wrap.innerHTML = cards.map((c, i) => `
+      <div class="hero-card-float card-${(i % 4) + 1}">
+        <div class="card-icon">${c.icon}</div>
+        <div>
+          <div class="card-title">${c.judul}</div>
+          <div class="card-sub">${c.sub}</div>
+        </div>
+      </div>`).join('');
+  })();
+
+  (function renderTimeline() {
+    const el = document.getElementById('timelineList');
+    if (!el) return;
+    const items = DB.getTimeline().slice().sort((a, b) => a.urutan - b.urutan);
+    el.innerHTML = items.map(t => `
+      <div class="timeline-item${t.aktif ? ' active' : ''}">
+        <div class="timeline-date">${t.tanggal}</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <h4>${t.judul}</h4>
+          <p>${t.deskripsi}</p>
+        </div>
+      </div>`).join('');
+  })();
+</script>
+</body>
+</html>
