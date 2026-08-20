@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Beasiswa Alumni - IKASI</title>
-<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('beasiswa_theme') || 'light');</script>
+<script>
+  // Tampilkan splash screen sekali per sesi browser sebelum masuk ke Beranda
+  if (!sessionStorage.getItem('beasiswa_splash_seen')) {
+    window.location.replace('splash.html');
+  }
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('beasiswa_theme') || 'light');
+</script>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -14,8 +20,8 @@
 <nav class="navbar" id="navbar">
   <div class="container">
     <a href="index.html" class="logo">
-      <img src="logo-ikasi.png" alt="Logo IKASI" class="logo-icon-img">
-      <span class="logo-text-ikasi">Ikatan Alumni Jurusan Teknik Sipil<br>Poli ITB - Politeknik Negeri Bandung</span>
+      <img src="logo-ikasi.png" alt="Logo IKASI" class="logo-icon-img-nav">
+      <span class="logo-text-nav">Beasiswa <strong>Alumni</strong> IKASI</span>
     </a>
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Beranda</a></li>
@@ -156,8 +162,8 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <a href="index.html" class="logo">
-          <img src="logo-ikasi.png" alt="Logo IKASI" class="logo-icon-img">
-          <span class="logo-text-ikasi">Ikatan Alumni Jurusan Teknik Sipil<br>Poli ITB - Politeknik Negeri Bandung</span>
+          <img src="logo-ikasi.png" alt="Logo IKASI" class="logo-icon-img-nav">
+          <span class="logo-text-nav">Beasiswa <strong>Alumni</strong> IKASI</span>
         </a>
         <p>Program beasiswa terpercaya untuk mahasiswa berprestasi Indonesia dalam mewujudkan mimpi pendidikan terbaik.</p>
         <div class="social-links">
