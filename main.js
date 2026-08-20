@@ -1,7 +1,7 @@
 /* === MAIN.JS - Shared Utilities === */
 
 // ⚠️ GANTI dengan URL Web App Apps Script kamu setelah deploy (lihat PANDUAN_PUBLISH.md)
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/GANTI_DENGAN_DEPLOYMENT_ID/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzZ5B-tjw8zdZjkNWOSD99ZnTtJSocamoBH9dM4bvFYz9vKvd_zlJoE60nqxw9oW6H/exec';
 // ⚠️ Harus SAMA PERSIS dengan ADMIN_TOKEN di Code.gs
 const ADMIN_API_TOKEN = 'beasiswa2026';
 
@@ -96,6 +96,62 @@ const DB = {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'setDeadline', value, token: ADMIN_API_TOKEN })
+            });
+            return await res.json();
+        } catch (err) {
+            return { ok: false, error: 'Gagal terhubung ke server.' };
+        }
+    },
+
+    // Tarik semua konten publik sekaligus (deadline, pengumuman, timeline, kartu beranda)
+    // dari Google Sheets, lalu perbarui cache lokal. Dipanggil di halaman publik & admin.
+    async syncPublicContentFromServer() {
+        try {
+            const res = await fetch(`${APPS_SCRIPT_URL}?action=getPublicContent`);
+            const json = await res.json();
+            if (!json.ok) return { ok: false };
+            if (json.deadline) DB.setDeadline(json.deadline);
+            DB.setPengumuman(JSON.parse(json.pengumuman || '[]'));
+            DB.setTimeline(JSON.parse(json.timeline || '[]'));
+            DB.setHeroCards(JSON.parse(json.herocards || '[]'));
+            return { ok: true };
+        } catch (err) {
+            return { ok: false };
+        }
+    },
+
+    async setPengumumanOnServer(list) {
+        try {
+            const res = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'setPengumuman', value: list, token: ADMIN_API_TOKEN })
+            });
+            return await res.json();
+        } catch (err) {
+            return { ok: false, error: 'Gagal terhubung ke server.' };
+        }
+    },
+
+    async setTimelineOnServer(list) {
+        try {
+            const res = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'setTimeline', value: list, token: ADMIN_API_TOKEN })
+            });
+            return await res.json();
+        } catch (err) {
+            return { ok: false, error: 'Gagal terhubung ke server.' };
+        }
+    },
+
+    async setHeroCardsOnServer(list) {
+        try {
+            const res = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'setHeroCards', value: list, token: ADMIN_API_TOKEN })
             });
             return await res.json();
         } catch (err) {
@@ -212,15 +268,19 @@ if (document.getElementById('countdown')) {
     startCountdown(DB.getDeadline());
     const deadlineEl = document.getElementById('ctaDeadlineText');
     if (deadlineEl) deadlineEl.textContent = formatDate(DB.getDeadline());
-
-    // Tarik deadline terbaru dari server (Google Sheets), lalu restart countdown kalau berubah
-    DB.syncDeadlineFromServer().then(result => {
-        if (result.ok) {
-            startCountdown(DB.getDeadline());
-            if (deadlineEl) deadlineEl.textContent = formatDate(DB.getDeadline());
-        }
-    });
 }
+
+// Tarik semua konten publik terbaru dari server (deadline, pengumuman, timeline, kartu beranda),
+// lalu kabari halaman (index.html, pengumuman.html, dll) supaya render ulang dengan data terbaru.
+DB.syncPublicContentFromServer().then(result => {
+    if (!result.ok) return;
+    if (document.getElementById('countdown')) {
+        startCountdown(DB.getDeadline());
+        const deadlineEl = document.getElementById('ctaDeadlineText');
+        if (deadlineEl) deadlineEl.textContent = formatDate(DB.getDeadline());
+    }
+    document.dispatchEvent(new CustomEvent('publicContentSynced'));
+});
 
 /* Tema Siang / Malam */
 function applyTheme(theme) {

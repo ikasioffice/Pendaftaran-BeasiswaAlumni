@@ -110,13 +110,23 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
     });
 });
 
-function checkStatus() {
+async function checkStatus() {
     const id = (document.getElementById('checkId').value || '').trim().toUpperCase();
     const box = document.getElementById('statusResult');
     if (!id) { showToast('Masukkan nomor ID pendaftaran.', 'error'); return; }
 
-    const list = DB.getPendaftar();
-    const found = list.find(p => p.id.toUpperCase() === id);
+    box.className = 'status-result show';
+    box.innerHTML = `<div style="text-align:center;padding:12px;color:var(--gray-500)"><i class="fas fa-spinner fa-spin"></i> Mencari data...</div>`;
+
+    let found = null;
+    try {
+        const res = await fetch(`${APPS_SCRIPT_URL}?action=checkStatus&id=${encodeURIComponent(id)}`);
+        const json = await res.json();
+        if (json.ok && json.found) found = json.data;
+    } catch (err) {
+        box.innerHTML = `<div style="text-align:center;padding:12px;color:var(--danger)"><i class="fas fa-exclamation-circle"></i> Gagal terhubung ke server. Coba lagi.</div>`;
+        return;
+    }
 
     if (!found) {
         box.className = 'status-result show';
@@ -174,3 +184,4 @@ function checkStatus() {
 
 // Init
 renderAnn();
+document.addEventListener('publicContentSynced', renderAnn);

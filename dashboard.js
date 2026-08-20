@@ -45,10 +45,22 @@ function showPanel(name) {
 
     if (name === 'beranda') refreshPendaftarThenRender('beranda');
     if (name === 'pendaftar') refreshPendaftarThenRender('pendaftar');
-    if (name === 'pengumuman') renderAnnList();
-    if (name === 'herocards') renderHeroCardsList();
-    if (name === 'timeline') renderTimelineList();
+    if (name === 'pengumuman') refreshContentThenRender('pengumuman');
+    if (name === 'herocards') refreshContentThenRender('herocards');
+    if (name === 'timeline') refreshContentThenRender('timeline');
     if (name === 'deadline') renderDeadlineForm();
+}
+
+// Sinkronkan Pengumuman/Timeline/Kartu Beranda dari server, lalu render ulang panelnya
+async function refreshContentThenRender(target) {
+    const renderFn = { pengumuman: renderAnnList, herocards: renderHeroCardsList, timeline: renderTimelineList }[target];
+    renderFn();
+    const result = await DB.syncPublicContentFromServer();
+    if (!result.ok) {
+        showToast('Gagal memuat data terbaru dari server.', 'error');
+        return;
+    }
+    renderFn();
 }
 
 // Sinkronkan data pendaftar dari Google Sheets, lalu render tampilannya
@@ -413,7 +425,7 @@ function editAnn(id) {
     openModal('modalAnn');
 }
 
-function saveAnn() {
+async function saveAnn() {
     const judul = document.getElementById('annJudul').value.trim();
     const tipe = document.getElementById('annTipe').value;
     const tanggal = document.getElementById('annTanggal').value;
@@ -434,6 +446,13 @@ function saveAnn() {
         list.push({ id: newId, judul, tipe, tanggal: new Date(tanggal).toISOString(), isi, dibuat: new Date().toISOString() });
     }
 
+    const btn = document.querySelector('#modalAnn .btn-primary');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; }
+    const result = await DB.setPengumumanOnServer(list);
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Simpan'; }
+
+    if (!result.ok) { showToast(result.error || 'Gagal menyimpan ke server.', 'error'); return; }
+
     DB.setPengumuman(list);
     closeModal('modalAnn');
     renderAnnList();
@@ -445,8 +464,11 @@ function confirmHapusAnn(id) {
     const a = list.find(x => x.id === id);
     if (!a) return;
     document.getElementById('hapusMsg').textContent = `Pengumuman "${a.judul}" akan dihapus permanen.`;
-    document.getElementById('btnHapusConfirm').onclick = () => {
-        DB.setPengumuman(list.filter(x => x.id !== id));
+    document.getElementById('btnHapusConfirm').onclick = async () => {
+        const newList = list.filter(x => x.id !== id);
+        const result = await DB.setPengumumanOnServer(newList);
+        if (!result.ok) { showToast(result.error || 'Gagal menghapus di server.', 'error'); return; }
+        DB.setPengumuman(newList);
         closeModal('modalHapus');
         renderAnnList();
         showToast('Pengumuman berhasil dihapus.', 'success');
@@ -506,7 +528,7 @@ function editHeroCard(id) {
     openModal('modalHeroCard');
 }
 
-function saveHeroCard() {
+async function saveHeroCard() {
     const icon = document.getElementById('hcIcon').value.trim() || '⭐';
     const judul = document.getElementById('hcJudul').value.trim();
     const sub = document.getElementById('hcSub').value.trim();
@@ -525,13 +547,20 @@ function saveHeroCard() {
         list.push({ id: newId, icon, judul, sub, urutan });
     }
 
+    const btn = document.querySelector('#modalHeroCard .btn-primary');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; }
+    const result = await DB.setHeroCardsOnServer(list);
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Simpan'; }
+
+    if (!result.ok) { showToast(result.error || 'Gagal menyimpan ke server.', 'error'); return; }
+
     DB.setHeroCards(list);
     closeModal('modalHeroCard');
     renderHeroCardsList();
     showToast(editId ? 'Kartu beranda berhasil diperbarui.' : 'Kartu beranda berhasil ditambahkan.', 'success');
 }
 
-function moveHeroCard(id, dir) {
+async function moveHeroCard(id, dir) {
     const list = (DB.getHeroCards() || []).slice().sort((a, b) => a.urutan - b.urutan);
     const idx = list.findIndex(x => x.id === id);
     const swapIdx = idx + dir;
@@ -539,6 +568,8 @@ function moveHeroCard(id, dir) {
     const tmp = list[idx].urutan;
     list[idx].urutan = list[swapIdx].urutan;
     list[swapIdx].urutan = tmp;
+    const result = await DB.setHeroCardsOnServer(list);
+    if (!result.ok) { showToast(result.error || 'Gagal menyimpan ke server.', 'error'); return; }
     DB.setHeroCards(list);
     renderHeroCardsList();
 }
@@ -548,8 +579,11 @@ function confirmHapusHeroCard(id) {
     const c = list.find(x => x.id === id);
     if (!c) return;
     document.getElementById('hapusMsg').textContent = `Kartu beranda "${c.judul}" akan dihapus permanen.`;
-    document.getElementById('btnHapusConfirm').onclick = () => {
-        DB.setHeroCards(list.filter(x => x.id !== id));
+    document.getElementById('btnHapusConfirm').onclick = async () => {
+        const newList = list.filter(x => x.id !== id);
+        const result = await DB.setHeroCardsOnServer(newList);
+        if (!result.ok) { showToast(result.error || 'Gagal menghapus di server.', 'error'); return; }
+        DB.setHeroCards(newList);
         closeModal('modalHapus');
         renderHeroCardsList();
         showToast('Kartu beranda berhasil dihapus.', 'success');
@@ -614,7 +648,7 @@ function editTimeline(id) {
     openModal('modalTimeline');
 }
 
-function saveTimeline() {
+async function saveTimeline() {
     const judul = document.getElementById('tlJudul').value.trim();
     const tanggal = document.getElementById('tlTanggal').value.trim();
     const deskripsi = document.getElementById('tlDeskripsi').value.trim();
@@ -636,13 +670,20 @@ function saveTimeline() {
         list.push({ id: newId, judul, tanggal, deskripsi, aktif, urutan });
     }
 
+    const btn = document.querySelector('#modalTimeline .btn-primary');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; }
+    const result = await DB.setTimelineOnServer(list);
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Simpan'; }
+
+    if (!result.ok) { showToast(result.error || 'Gagal menyimpan ke server.', 'error'); return; }
+
     DB.setTimeline(list);
     closeModal('modalTimeline');
     renderTimelineList();
     showToast(editId ? 'Tahap timeline berhasil diperbarui.' : 'Tahap timeline berhasil ditambahkan.', 'success');
 }
 
-function moveTimeline(id, dir) {
+async function moveTimeline(id, dir) {
     const list = DB.getTimeline().slice().sort((a, b) => a.urutan - b.urutan);
     const idx = list.findIndex(x => x.id === id);
     const swapIdx = idx + dir;
@@ -650,6 +691,8 @@ function moveTimeline(id, dir) {
     const tmp = list[idx].urutan;
     list[idx].urutan = list[swapIdx].urutan;
     list[swapIdx].urutan = tmp;
+    const result = await DB.setTimelineOnServer(list);
+    if (!result.ok) { showToast(result.error || 'Gagal menyimpan ke server.', 'error'); return; }
     DB.setTimeline(list);
     renderTimelineList();
 }
@@ -659,8 +702,11 @@ function confirmHapusTimeline(id) {
     const t = list.find(x => x.id === id);
     if (!t) return;
     document.getElementById('hapusMsg').textContent = `Tahap timeline "${t.judul}" akan dihapus permanen.`;
-    document.getElementById('btnHapusConfirm').onclick = () => {
-        DB.setTimeline(list.filter(x => x.id !== id));
+    document.getElementById('btnHapusConfirm').onclick = async () => {
+        const newList = list.filter(x => x.id !== id);
+        const result = await DB.setTimelineOnServer(newList);
+        if (!result.ok) { showToast(result.error || 'Gagal menghapus di server.', 'error'); return; }
+        DB.setTimeline(newList);
         closeModal('modalHapus');
         renderTimelineList();
         showToast('Tahap timeline berhasil dihapus.', 'success');
